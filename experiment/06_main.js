@@ -20,6 +20,7 @@ $("document").ready(function() {
             test_trials,
             pre_test,
             main_trials,
+            mouse_question,
             post_test,
             thanks,
         ],

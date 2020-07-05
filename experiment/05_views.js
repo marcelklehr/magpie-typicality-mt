@@ -41,6 +41,19 @@ const post_test = magpieViews.view_generator("post_test", {
   // add question about mouse vs. trackpad
 });
 
+const mouse_question = magpieViews.view_generator('forced_choice', {
+  trials: 1,
+  name: 'mouse_question',
+  title: 'Technical information',
+  data: [
+    {
+      question: 'Are you using a mouse or a touch pad with your computer?',
+      option1: 'Mouse',
+      option2: 'Touch pad'
+    }
+  ]
+})
+
 const thanks = magpieViews.view_generator("thanks", {
   trials: 1,
   name: 'thanks',
