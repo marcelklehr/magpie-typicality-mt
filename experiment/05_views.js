@@ -8,6 +8,9 @@ const intro = magpieViews.view_generator("intro", {
             Participating in this experiment will take about 10mins of your time. Thank you for donating this time to science.
             <br />
             <br />
+            Note: Please use a computer or laptop to participate in this study, rather than mobile devices like phones or tablets.
+            <br />
+            <br />
             On the next view you will find general instructions on how to proceed.`,
   buttonText: 'begin the experiment'
 });
