@@ -94,8 +94,8 @@ const test_trials = magpieViews.view_generator("read_and_decide", {
   trials: trial_info.test_trial.length,
   name: 'read_and_decide_test',
   data: trial_info.test_trial,
+  decisionEvent: 'click',
   mousetracking: {
-    decisionEvent: 'click',
     rate: 24
   }
 });
@@ -104,8 +104,8 @@ const main_trials = magpieViews.view_generator("read_and_decide", {
   trials: trial_info.main_trial.length,
   name: 'read_and_decide',
   data: trial_info.main_trial,
+  decisionEvent: 'click',
   mousetracking: {
-    decisionEvent: 'click',
     rate: 24
   }
 });
