@@ -20,3 +20,10 @@
 .magpie-response-picture {
    padding: 100px 0;
 }
+
+.magpie-view-answer-container button {
+  height: 50px;
+   min-width: 70px;
+   font-size: 20px;
+}
+
