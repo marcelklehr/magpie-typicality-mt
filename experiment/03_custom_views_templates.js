@@ -59,15 +59,9 @@ answer_container_generators.read_and_decide = function(config, CT) {
     }
 
     return `<div class='magpie-view-answer-container'>
-                            <div class='magpie-view-picture magpie-response-picture magpie-response-picture-left' id="img1">${left}</div>
-                            <div class='magpie-view-picture magpie-response-picture magpie-response-picture-right' id="img2">${right}</div>
+                            <div class='magpie-view-picture magpie-response-picture magpie-response-picture-left' id="img1"><button>${left}</button></div>
+                            <div class='magpie-view-picture magpie-response-picture magpie-response-picture-right' id="img2"><button>${right}</button></div>
                             <p class="clearfix"></p>
-                            <p>&nbsp;</p>
-                            <p>&nbsp;</p>
-                            <p>&nbsp;</p>
-                            <p>&nbsp;</p>
-                            <p>&nbsp;</p>
-                            <p>&nbsp;</p>
                         <button class="magpie-lad-start">Start</button>
                     </div>`;
 };
