@@ -57,6 +57,19 @@ const mouse_question = magpieViews.view_generator('forced_choice', {
   ]
 })
 
+const hand_question = magpieViews.view_generator('forced_choice', {
+  trials: 1,
+  name: 'hand_question',
+  title: 'Strong hand',
+  data: [
+    {
+      question: 'Are you using your left or right hand with your computer?',
+      option1: 'Left',
+      option2: 'Right'
+    }
+  ]
+})
+
 const thanks = magpieViews.view_generator("thanks", {
   trials: 1,
   name: 'thanks',

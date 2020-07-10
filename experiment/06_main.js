@@ -21,6 +21,7 @@ $("document").ready(function() {
             pre_test,
             main_trials,
             mouse_question,
+            hand_question,
             post_test,
             thanks,
         ],
