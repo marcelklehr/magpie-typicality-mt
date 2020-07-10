@@ -70,6 +70,19 @@ const hand_question = magpieViews.view_generator('forced_choice', {
   ]
 })
 
+const understanding_question = magpieViews.view_generator('forced_choice', {
+  trials: 1,
+  name: 'understanding_question',
+  title: 'Language understanding',
+  data: [
+    {
+      question: 'Did you understand all directions and words?',
+      option1: 'Yes',
+      option2: 'No'
+    }
+  ]
+})
+
 const thanks = magpieViews.view_generator("thanks", {
   trials: 1,
   name: 'thanks',

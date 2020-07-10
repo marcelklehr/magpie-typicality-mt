@@ -20,6 +20,7 @@ $("document").ready(function() {
             test_trials,
             pre_test,
             main_trials,
+            understanding_question,
             mouse_question,
             hand_question,
             post_test,
