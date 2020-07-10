@@ -24,6 +24,8 @@
 .magpie-view-answer-container button {
   height: 50px;
    min-width: 70px;
-   font-size: 20px;
+   font-size: 25px;
 }
-
+.magpie-view-answer-container, .magpie-lad-start {
+    font-size: 25px !important;
+}
