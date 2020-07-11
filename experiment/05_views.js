@@ -2,17 +2,22 @@ const intro = magpieViews.view_generator("intro", {
   trials: 1,
   name: 'intro',
   // If you use JavaScripts Template String `I am a Template String`, you can use HTML <></> and javascript ${} inside
-  text: `Hello!
+  text: `Welcome to the experiment!
+            <br />
+            Thank you for your interest in participating and making an important contribution to the world of science!
+            <br />
+            In this experiment you will be asked to decide which category an animal belongs to.
+            The whole experiment will take about 10 minutes.
             <br />
             <br />
-            Participating in this experiment will take about 10mins of your time. Thank you for donating this time to science.
+            Important: If possible, please use a computer or laptop with an external mouse to participate in this study, rather than mobile devices like phones or tablets. 
+            This will make navigating the online experiment a lot easier for you.
             <br />
+            Please also note that the whole experiment will be in english. If you have trouble understanding something, please just continue with the experiment and state 
+            your difficulties in the comment section at the end of experiment.
             <br />
-            Note: Please use a computer or laptop to participate in this study, rather than mobile devices like phones or tablets.
-            <br />
-            <br />
-            On the next view you will find general instructions on how to proceed.`,
-  buttonText: 'begin the experiment'
+            Please press 'Continue' to see the experiment instructions.`,
+  buttonText: 'Continue'
 });
 
 // For most tasks, you need instructions views
@@ -20,19 +25,31 @@ const instructions = magpieViews.view_generator("instructions", {
   trials: 1,
   name: 'instructions',
   title: 'General Instructions',
-  text: `In the following you will be given two categories to choose from, as well as, after the click of a button, a word to categorize into one of the two categories. Please try to click on the respective category as quickly a possible while being as accurate as possible.
+  text: `In this experiment you will first see two category names in the upper corners of the screen.
+            You will have time to read the categories and then after a few seconds a 'Start' button will appear at the bottom.
+            Upon pressing the 'Start' button, the name of an animal will appear in its place.
+            It is your task to judge to which of the two presented categories the animal belongs to.
+            <br />
+            Indicate your choice by clicking on the respective category.
+            <br />
+            Try to make your choices as accurate and fast as possible!
             <br />
             <br />
-            You now have the opportunity to get familiar with the procedure by means of a few test runs.`,
-  buttonText: 'go to trials'
+            Before we start the actual experiment there will be a few practice trials such that you can get an idea on
+            how the experiment will look like.
+            <br />
+            Please press 'Start practice trials' to continue.`,
+  buttonText: 'Start practice trials'
 });
 
 const pre_test = magpieViews.view_generator("instructions", {
   trials: 1,
   name: 'pre_test',
   title: 'Real experiment',
-  text: 'Now that you have familiarized yourself with the task, the real experiment starts.',
-  buttonText: 'start experiment'
+  text: `Now that you have familiarized yourself with the task, the real experiment starts.
+         <br />
+         Remember: Try to make your choices as accurate and fast as possible!`,
+  buttonText: 'Start experiment'
   // add question about mouse vs. trackpad
 });
 
