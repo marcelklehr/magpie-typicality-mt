@@ -90,15 +90,15 @@ const hand_question = magpieViews.view_generator('forced_choice', {
   ]
 })
 
-const understanding_question = magpieViews.view_generator('forced_choice', {
+const understanding_question = magpieViews.view_generator('rating_scale', {
   trials: 1,
   name: 'understanding_question',
   title: 'Language understanding',
   data: [
     {
-      question: 'Did you understand all directions and words?',
-      option1: 'Yes',
-      option2: 'No'
+      question: 'Hwo confident are you about your understanding of the words?',
+      optionLeft: 'Understood nothing',
+      optionRight: 'Understood everything'
     }
   ]
 })
