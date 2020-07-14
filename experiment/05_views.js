@@ -25,7 +25,10 @@ const instructions = magpieViews.view_generator("instructions", {
   trials: 1,
   name: 'instructions',
   title: 'General Instructions',
-  text: `In this experiment you will first see two category names in the upper corners of the screen.
+  text: `Important: Please leave your browser window at the same size as your computer screen during the experiment.
+            <br />
+            <br />
+            In this experiment you will first see two category names in the upper corners of the screen.
             You will have time to read the categories and then after a few seconds a 'Start' button will appear at the bottom.
             Upon pressing the 'Start' button, the name of an animal will appear in its place.
             It is your task to judge to which of the two presented categories the animal belongs to.
