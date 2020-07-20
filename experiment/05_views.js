@@ -96,7 +96,7 @@ const understanding_question = magpieViews.view_generator('rating_scale', {
   title: 'Language understanding',
   data: [
     {
-      question: 'Hwo confident are you about your understanding of the words?',
+      question: 'How confident are you about your understanding of the words?',
       optionLeft: 'Understood nothing',
       optionRight: 'Understood everything'
     }
