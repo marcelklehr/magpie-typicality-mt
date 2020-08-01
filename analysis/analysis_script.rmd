@@ -1,0 +1,247 @@
+---
+title: "Analysis"
+author: "Marcel Klehr"
+date: "7/10/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#packages
+```{r warning=FALSE}
+
+library(tidyverse)
+library(mousetrap)
+library(zoo)
+```
+# Load test data
+
+```{r}
+
+raw_data = read_csv('C:\\Users\\Thomas Bernhardt\\Downloads\\results_finalr, (1).csv')
+raw_data
+
+tab<-raw_data %>% group_by(condition) %>% summarise(
+  accuracy = sum(response == 'target')/n(),
+  min_rt = min(mousetrackingDuration),
+  mean_rt = mean(mousetrackingDuration),
+  median_rt = median(mousetrackingDuration),
+  max_rt = max(mousetrackingDuration),
+)
+tab
+```
+
+
+# tidy up data
+```{r}
+tidy_data <- raw_data %>%
+  # filter out non-mouse users
+  filter(submission_id %in% raw_data$submission_id[raw_data$response == 'Mouse']) %>%
+  # filter out lefties
+  filter(submission_id %in% raw_data$submission_id[raw_data$response == 'Right']) %>%
+  # filter out non-understanders
+  filter(submission_id %in% raw_data$submission_id[as.double(raw_data$response) >= 3]) %>%
+  # filter out test trials
+  filter(trial_name == 'read_and_decide') %>%
+  # filter out the participant who used a touch screen
+  filter(submission_id %in% raw_data$submission_id[raw_data$submission_id != "1574"]) %>%
+  # filter out slow trials
+  filter(mousetrackingDuration < 5000) %>%
+  print
+
+
+
+
+```
+
+# Response accuracy
+```{r}
+tidy_data %>% group_by(condition) %>% summarise(
+  accuracy = sum(response == 'target')/n(),
+  min_rt = min(mousetrackingDuration),
+  mean_rt = mean(mousetrackingDuration),
+  median_rt = median(mousetrackingDuration),
+  max_rt = max(mousetrackingDuration),
+)
+```
+#C_S_test
+```{r}
+chisq.test(tidy_data$condition, tidy_data$response)
+
+```
+# filter out inaccurate assignments
+
+```{r}
+
+data <- tidy_data %>% filter(response == 'target') %>% print
+
+```
+
+## Time-normalized analysis
+```{r}
+library(zoo)
+library(tidyverse)
+
+time_normalized_data <- data %>% mutate(
+  mousetrackingX = mousetrackingDuration %>% imap(function(x,i) {
+    normalized <- seq.int(0, x, length.out=101)
+    print(as.double(unlist(mousetrackingTime[i] %>% str_split(fixed('|')))))
+    recordedX <- zoo(
+      as.double(mousetrackingX[i] %>% str_split(fixed('|'), simplify=T)),
+      unique(as.double(unlist(mousetrackingTime[i] %>% str_split(fixed('|')))))
+    )
+    unlist(as.double(na.approx(object=recordedX, xout=normalized)))
+  }),
+  mousetrackingY = mousetrackingDuration %>% imap(function(x,i ) {
+    normalized <- seq.int(0, x, length.out=101)
+    recordedY <- zoo(
+      as.double(mousetrackingY[i] %>% str_split(fixed('|'), simplify=T)),
+       unique(as.double(unlist(mousetrackingTime[i] %>% str_split(fixed('|')))))
+    )
+    unlist(as.double(na.approx(object=recordedY, xout=normalized)))
+  }),
+  mousetrackingTime = mousetrackingDuration %>% imap(function(x,i ) {
+    unlist(as.double(seq.int(0, 101, length.out=101)))
+  })
+)
+time_normalized_data
+```
+
+# Normalize horizontally
+```{r}
+hor_normalized_data <- time_normalized_data %>% mutate(
+  mousetrackingHorizontal = mousetrackingX %>% imap(function(x,i) { x*(-1)**(as.double(target_location[i]=='left'))})
+)
+
+hor_normalized_data
+```
+
+## Visualize trajectories
+```{r}
+plot <- hor_normalized_data %>% unnest(cols=c(mousetrackingHorizontal, mousetrackingTime,mousetrackingY)) %>% select(submission_id, trial_number, mousetrackingHorizontal, mousetrackingTime, mousetrackingY,condition)
+
+plot
+```
+
+```{r}
+mean_plot <- plot %>% group_by(condition, mousetrackingTime) %>% summarise(mean_h = mean(mousetrackingHorizontal)) %>% select(mean_h, condition, mousetrackingTime) %>% print
+plot %>% ggplot(aes(mousetrackingTime, mousetrackingHorizontal)) +
+  geom_jitter(aes(color=condition), alpha=0.02) +
+  geom_line(data=mean_plot, aes(mousetrackingTime, mean_h, color=condition))
+
+```
+
+## T-test
+```{r}
+controls <- plot %>% filter(condition == 'control')
+trials <- plot %>% filter(condition != 'control')
+
+delta_0 <- 0
+# sample mean for organic (group A)
+mu_A <- controls %>% group_by(mousetrackingTime) %>% summarise(
+  c_meanH = mean(mousetrackingHorizontal),
+  c_n = n(),
+  c_sd = sd(mousetrackingHorizontal),
+)
+# sample mean for conventional (group B)
+mu_B <- trials %>% group_by(mousetrackingTime) %>% summarise(
+  t_meanH = mean(mousetrackingHorizontal),
+  t_n = n(),
+  t_sd = sd(mousetrackingHorizontal)
+)
+
+t_result <- full_join(mu_A, mu_B, by='mousetrackingTime') %>% mutate(
+  sigma = sqrt(((c_n-1)*c_sd^2 + (t_n-1)*t_sd^2)/(c_n+t_n-2)*(1/c_n+1/t_n)),
+  t = (c_meanH - t_meanH - delta_0) / sigma,
+  p = 1 - pt(q = t, df = c_n + t_n - 1)
+)
+
+t_result %>% filter(p < 0.05) %>% ggplot(aes(mousetrackingTime, t)) + geom_jitter(aes(color=p))
+
+t_result %>% summarise(
+  t_mean = mean(t, na.rm=TRUE),
+  p_mean=mean(p, na.rm=TRUE),
+  t_mean_weighted = sum(t*(1-p), na.rm=TRUE)/n(),
+  p_mean_weighted = sum(p*p, na.rm=TRUE)/n()
+)
+```
+
+
+```{r}
+
+t.test(RT~condition,data=time_normalized_data)
+
+```
+
+```{r}
+anova_data <- plot %>% mutate(mousetrackingTime = ifelse(mousetrackingTime < 34, 1, ifelse(mousetrackingTime > 67, 3, 2)))
+anova_data %>% print %>% ggplot(aes(x=factor(mousetrackingTime), y=plyr::round_any(mousetrackingHorizontal, 50))) +
+  geom_jitter(aes(color=condition), alpha=0.05) +
+  geom_violin(aes(color=condition), trim = FALSE, position = position_dodge(0.9)) + 
+  geom_boxplot(aes(color = condition), width = 0.15, position = position_dodge(0.9), outlier.alpha = 0) %>% print
+
+aov(formula = mousetrackingHorizontal ~ condition * mousetrackingTime, anova_data) %>% summary()
+```
+
+## Space-normalized analysis
+```{r}
+space_normalized_data <- data %>% mutate(
+  mousetrackingX = mousetrackingX %>% imap(function(x,i) {
+    x = unlist(as.double(str_split(x, fixed('|'), simplify=TRUE)))
+    x/abs(x[length(x)-1])
+  }),
+  mousetrackingY = mousetrackingY %>% imap(function(y,i ) {
+    y = unlist(as.double(str_split(y, fixed('|'), simplify=TRUE)))
+    y/abs(y[length(y)-1])*-1
+  }),
+  mousetrackingTime = mousetrackingTime %>% imap(function(t,i ) {
+    unlist(as.double(str_split(t, fixed('|'), simplify=TRUE)))
+  })
+)
+space_normalized_data
+```
+
+## Normalize horizontally
+```{r}
+hor_space_normalized_data <- space_normalized_data %>% mutate(
+  mousetrackingHorizontal = mousetrackingX %>% imap(function(x,i) { x*(-1)**(as.double(target_location[i]=='left'))})
+)
+
+hor_space_normalized_data
+```
+
+## Visualize trajectories
+```{r}
+plot <- hor_space_normalized_data %>% unnest(cols=c(mousetrackingHorizontal, mousetrackingTime, mousetrackingY)) %>% select(submission_id, trial_number, mousetrackingHorizontal, mousetrackingTime, condition, mousetrackingY)
+
+plot
+```
+
+```{r}
+mean_plot <- plot %>%
+  mutate(mousetrackingTime = ifelse(mousetrackingTime < 500, 1, ifelse(mousetrackingTime < 1000, 2, ifelse(mousetrackingTime < 1500, 3, 4)))) %>%
+  group_by(condition, mousetrackingTime) %>%
+  summarise(
+    mean_x = mean(mousetrackingHorizontal), 
+    mean_y = mean(mousetrackingY)
+  ) %>%
+  select(mean_x, mean_y, condition, mousetrackingTime) %>% print
+
+plot %>%
+  mutate(mousetrackingTime = ifelse(mousetrackingTime < 500, 1, ifelse(mousetrackingTime < 1000, 2, ifelse(mousetrackingTime < 1500, 3, 4)))) %>%
+  ggplot(aes(mousetrackingY, mousetrackingHorizontal, color=condition,)) +
+  geom_jitter(aes( shape=factor(mousetrackingTime)), alpha=0.03) +
+  geom_line(data=mean_plot, aes(mean_y, mean_x))+
+  geom_point(data=mean_plot, aes(mean_y, mean_x, shape=factor(mousetrackingTime)))
+```
+
+```{r}
+anova_data <- plot %>%
+  mutate(mousetrackingTime = ifelse(mousetrackingTime < 500, 1, ifelse(mousetrackingTime < 1000, 2, ifelse(mousetrackingTime < 1500, 3, 4))))
+
+aov(formula = mousetrackingHorizontal * mousetrackingY ~ condition * mousetrackingTime, anova_data) %>% summary()
+```
+
